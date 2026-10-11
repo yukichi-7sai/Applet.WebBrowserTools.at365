@@ -1,75 +1,42 @@
-# Applet.WebBrowserTools.at365 開発ガイド
+# WebBrowserTools 開発ガイド
 
-実装時のテスト選択、コミット前の必要回帰、リリース前のコミット/プッシュ確認と検証証跡の再利用は、[本体・Applet共通手順](../AppDock.at365/docs/development-workflow.md)に従います。この文書の試験コマンドは、その段階に応じて実行します。
+実装・コミット・リリースの段階別検証は[本体共通手順](../AppDock.at365/docs/development-workflow.md)に従います。利用者向けは[README](README.md)、実測結果は[VERIFICATION](VERIFICATION.md)です。
 
-利用方法は[README.md](README.md)、実測結果と未確認事項は[VERIFICATION.md](VERIFICATION.md)を参照してください。
+## ビルド・配置
 
-## ビルド・発行・配置
-
-開発には.NET SDK 10と、隣の `../AppDock.at365` にSDK/Runtimeのソースが必要です。
+0.3.2からsrc/index.tsをJavaScriptへ変換するNode Appletです。隣接するAppDock.at365のtoolchain.jsonに固定したローカルNodeとTypeScriptを使います。グローバル環境やApplet固有の依存追加は不要です。更新ZIP生成には既存の.NET 10 SDKを使います。
 
 ```bat
 publish.bat
+publish.bat -OutputDirectory "C:\Temp\WebBrowserTools" -AppDockRoot "C:\Source\AppDock.at365"
 deploy.bat "C:\Apps\AppDock.at365"
 ```
 
-[publish.bat](publish.bat)はReleaseの自己完結単一EXEとmanifestを `publish/Applet.WebBrowserTools.at365` へ発行します。任意の発行先やSDKの場所も指定できます。
+publishは型検査・Applet単体試験後、index.jsとextension.jsonをpublish/Applet.WebBrowserTools.at365へ、共通パッカーでupdate.zip/update.jsonをpublishへ生成します。指定OutputDirectoryでも更新ZIP/JSONの出力はrepo内publishです。公開・実利用配置はしません。
 
-```bat
-publish.bat -OutputDirectory "C:\Temp\WebBrowserTools" -AppDockRoot "C:\Source\AppDock.at365"
-```
+deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365へコピーし、旧Applet EXE/DLL/deps.json/runtimeconfig.jsonだけを取り除きます。対象AppDockを終了してから実行してください。引数なしでは[記入例](deploy.local.txt.example)に従うdeploy.local.txtを使い、両方未指定なら配置しません。ホストEXE・設定・データは変更しません。
 
-[deploy.bat](deploy.bat)は標準の発行先から、指定ホストの `extensions/Applet.WebBrowserTools.at365` へEXE・manifestを配置し、旧版のDLL・deps.jsonを除去します。配置前に対象AppDockを終了してください。ホストのEXEと設定は変更しません。SDK/RuntimeはAppletのEXEに含まれます。既存のコマンドIDと送信キー設定は引き続き使用できます。
+## 実装
 
-引数を省略する場合は[deploy.local.txt.example](deploy.local.txt.example)を `deploy.local.txt` にコピーし、1行目にホストフォルダーを記入します。引数が優先され、両方未指定なら使用方法を表示して終了します。独自の発行先はdeployの入力にはならないため、配置前に通常のpublishも実行してください。
+11個の安定IDを一度登録し、settings.onChangedで全送信キーを検証してから参照先をまとめて入れ替えます。不正変更では直前の有効設定を保持します。キー文法は従来の修飾キーと1キーの組です。自己設定には従来settings APIを使います。
 
-配置後にAppDockを起動し直して有効化してください。
+8操作はinput.sendKeys、戻る/進む/リロードはinput.appCommand（back/forward/reload）を呼びます。通常リロードとスーパーリロードを分け、Watchの旧Reloadは後者のCtrl+F5に相当します。汎用APPCOMMAND_CLOSE/NEWは使用しません。OS処理・対象ウィンドウ検査・物理キー待機・再入抑止・取消は[本体共通操作API](../AppDock.at365/docs/appdock-api.md)に集約しています。
+
+最低本体版0.26.37、appdock-api capability、全Applet共通sendInput許可を必要とします。Node workerが実行文脈と取消を伝播するため、Applet独自の実行元判定は行いません。MCPから明示公開されたコマンドを経由する呼出しも許可する設計です。このAppletの操作コマンドは現manifestでは外部公開を追加していません。
 
 ## 検証
 
 ```powershell
-dotnet run --project Applet.WebBrowserTools.RegressionTests -c Release
-dotnet run --project Applet.WebBrowserTools.RegressionTests -c Release -- --native
-dotnet run --project Applet.WebBrowserTools.RegressionTests -c Release -- --native-published publish/Applet.WebBrowserTools.at365/Applet.WebBrowserTools.at365.exe
-dotnet run --project Applet.WebBrowserTools.RegressionTests -c Release -- --gestures
-# AppDock側のローカルNodeを使用
-..\AppDock.at365\.tools\node\24.21.0\node.exe scripts\test-host.cjs ..\AppDock.at365 ..\AppDock.at365\publish\win-unpacked\AppDock.at365.exe
+..\AppDock.at365\.tools\node\24.21.0\node.exe scripts/build.cjs --test
+..\AppDock.at365\.tools\node\24.21.0\node.exe scripts/test-host.cjs
 ```
 
-`--native`と`--gestures`は一時的な専用ウィンドウを最前面にして入力を検証します。後者はカーソルを動かして終了時に位置を戻し、待機表示を`.artifacts/gesture-indicator.png`へ保存します。GUI/入力テストは最前面が競合しないよう1本ずつ実行してください。ホストテストは独立した `.artifacts` 配下の設定だけを使います。実測と未検証事項は[VERIFICATION.md](VERIFICATION.md)を参照してください。
+単体試験は文法・11操作・設定即時反映・不正変更の原子性・取消・停止を確認します。host試験は旧ジェスチャー設定移行・設定UI・再起動・停止を確認し、割り当て編集自体は本体の専用GUI試験で検証します。第1引数にホストrepo、第2引数にwin-unpacked EXEを渡せます。
 
-## 操作の実装
+実キー/操作メッセージは本体scripts/native-input-ui-test.cjsが専用ウィンドウで確認します。従来の.NET Applet/専用入力・ジェスチャー試験は本体へ移した処理の重複を避けるため削除しました。共通入力と物理ジェスチャーの試験は本体側へ集約します。GUIは直列で実行してください。
 
-Watchのタブ操作を引き継ぎ、通常リロードとスーパーリロードを分離しています。Watchの旧ReloadはCtrl+F5です。汎用APPCOMMAND_CLOSE/NEWはタブやブラウザウィンドウを指定する契約ではないため使用しません。
+## ジェスチャーと文書
 
-戻る・進む・リロードはWM_APPCOMMANDのAPPCOMMAND_BROWSER_BACKWARD (1)、APPCOMMAND_BROWSER_FORWARD (2)、APPCOMMAND_BROWSER_REFRESH (3)を使い、キー送信はWindowsのSendInputを使用します。v0.3.1以降は、コマンド送信先を可視の最前面ウィンドウから取得し、プロセス名/Chromiumクラスによる拒否は行いません。待機表示はWatchのXAMLを引き継いでいます。
+本体管理ジェスチャー・開始対象・取消・初期値・旧設定移行の正本は[本体ジェスチャー仕様](../AppDock.at365/docs/gestures.md)です。初期8操作のmanifest宣言と既存キー・IDを維持します。Appletに対象ブラウザ検査や入力フックを置きません。
 
-## 文書の更新
-
-READMEには動作環境・導入・操作・設定・利用上の制約を記載します。開発環境・ビルド・テスト・発行・開発者用配置・実装の説明はこのファイル、実測結果と未検証事項はVERIFICATION.mdへ記載します。共通方針は[AppDockのドキュメント方針](../AppDock.at365/docs/documentation.md)を参照してください。
-
-## 更新配布物の発行
-
-`publish.bat`は通常の発行先を生成した後、兄弟のAppDockリポジトリにある`scripts/pack-applet-update.ps1`で`publish/update.json`と`publish/update.zip`を自動生成します。共通パッカーのビルドに.NET 10 SDKが必要です。Gmail以外のAppletは、このパッケージ生成のためにNode.jsを導入する必要はありません。
-
-ZIP直下に`extension.json`と実行ファイル一式を置き、JSONにID・版・必要な本体版・ZIPのサイズとSHA256を記録します。`OutputDirectory`を指定できる発行スクリプトでも、指定先の配布内容を読み、更新用JSON/ZIPの出力先はこのリポジトリの`publish`です。通常配置用サブフォルダーへJSON/ZIPを混ぜず、`deploy.bat`の配置対象も増やしません。
-
-Web配布やGitHub Releaseには同じ発行で生成したJSONとZIPを一緒に置き、JSONを最後に公開してください。ソースコードの自動生成ZIPは使用しません。発行スクリプトから外部公開は行いません。[共通更新仕様](../AppDock.at365/docs/updates.md)と[配布先の確認手順](../AppDock.at365/docs/update-checklist.md)を参照してください。
-
-## v0.3.0の本体ジェスチャー連携
-
-共通の入力・設定・移行・取消契約は[本体のマウスジェスチャー仕様](../AppDock.at365/docs/gestures.md)を正本とする。最低本体版は0.26.0。defaultGestureBindingsで8操作の初期値を宣言する。本体は旧フックを無効化し、対象ブラウザ設定を通知する。送信キーとコマンドIDは維持する。
-
-.NET CommandExecution.Currentにgestureの起動文脈があればexpectedTargetを渡し、CancellationTokenで未送信処理を取り消す。通常ホットキー用150ms待機をジェスチャーへ追加しない。再入経路のガードは維持する。既存GestureState/MouseGestureServiceは旧動作の回帰比較用にも残るが、本体管理時には有効にしない。
-
-## v0.3.1の送信先
-
-実行場所は本体のショートカット/ジェスチャー割り当て条件へ任せる。IBrowserPlatform.ExecuteAsyncは操作・キー・CancellationToken・開始対象HWNDだけを受け取り、ブラウザー一覧/Chromium制限を受け取らない。hostManagedGesturesでは本体が通知するbrowserProcesses/requireChromiumWindowClassを読み込まず、旧フックも必ず無効にする。旧フックだけに残る対象判定は比較回帰用であり、現行本体から実行するコマンドの制限ではない。
-
-既定の8ジェスチャーはブラウザー条件を保ち、更新で利用者の割り当てを書き換えない。送信先の変更、取消、キー解放、通常経路の再入防止は維持する。AppDock本体のソース変更は不要。`--native`はChromium以外のクラス/プロセスを持つ専用Windowで実送信と対象変更の中止を確認する。
-
-`--native-published <EXE>`は同じ専用Windowを使い、発行済みEXEを隔離したstdin/stdout契約で起動する。ブラウザー一覧/Chromium制限を設定通知した状態で11コマンドを実行し、開始HWND一致のジェスチャー送信・不一致の中止・正常終了を確認する。実ブラウザー/各アプリの意味的な動作や本体入力フックの試験とは分けて記録する。
-
-## 開発生成物の保存先
-
-開発・テストの生成物は`.artifacts`へ保存します。2026-10-10に旧`artifacts`を中身を保持して改名しました。過去の検証記録内の当repoの`artifacts/`は`.artifacts/`へ読み替えてください。保存済みログ/JSONの内部パスは実行当時の値として保持しています。作業完了時の整理は[AppDockの共通手順](../AppDock.at365/DEVELOPMENT.md#作業完了時のテストフォルダー整理)に従い、実行中・状態不明・未解決の失敗記録・再利用する資料を保持します。
+更新配布物は[共通更新仕様](../AppDock.at365/docs/updates.md)と[確認手順](../AppDock.at365/docs/update-checklist.md)を参照してください。生成物は.artifactsへ保存し、[本体の整理手順](../AppDock.at365/DEVELOPMENT.md#作業完了時のテストフォルダー整理)に従います。過去記録の旧パスは履歴値として保持します。READMEは利用案内、開発情報は本書、検証結果はVERIFICATIONへ分けます。

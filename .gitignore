@@ -4,3 +4,5 @@ publish/
 .artifacts/
 deploy.local.txt
 *.user
+
+out/

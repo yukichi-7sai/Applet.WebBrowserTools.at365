@@ -1,16 +1,18 @@
 # Applet.WebBrowserTools.at365
 
-AppDock用のブラウザー便利コマンド集です。ブラウザー以外のアプリでも使えます。Windows x64 / AppDock 0.26.0以降が必要です。v0.3.1は.NET 10/WPFを含む単一EXEで、追加の.NETランタイムやブラウザ拡張のインストールは不要です。
+AppDock用のブラウザー便利コマンド集です。ブラウザー以外のアプリでも使えます。Windows x64 / AppDock 0.26.37以降が必要です。v0.3.2はAppDock内で動くJavaScript Appletです。追加のNode.jsやブラウザ拡張のインストールは不要です。
 
 ## 導入・更新
 
 1. AppDockをトレイの「終了」から完全終了します。
-2. 配布物の `extension.json`、`Applet.WebBrowserTools.at365.exe` を、AppDock.at365.exeの隣の `extensions/Applet.WebBrowserTools.at365/` に配置します。更新時も配布物一式をそろえて置き換えてください。
+2. 配布物の `extension.json`、`index.js` を、AppDock.at365.exeの隣の `extensions/Applet.WebBrowserTools.at365/` に配置します。更新時も配布物一式をそろえて置き換えてください。
 3. AppDockを起動し、「Applet」一覧で有効にします。操作やキーの割り当てはAppDockから行います。
 
 利用するPCにはAppDockの動作環境が必要です。詳細は[AppDockの導入案内](../AppDock.at365/README.md)を参照してください。
 
-旧DLL版から更新する場合は、同じ配置先の `Applet.WebBrowserTools.at365.dll` と `Applet.WebBrowserTools.at365.deps.json` を取り除いてください。既存のコマンドIDと送信キー設定はそのまま使えます。
+旧版から手動更新する場合は、同じ配置先の旧Applet EXE/DLL/deps.json/runtimeconfig.jsonを取り除いてください。既存のコマンドID・送信キー設定・ショートカット・ジェスチャー割り当てはそのまま使えます。
+
+「設定 → 一般 → Appletからの操作許可」の「Windowsへのキー・操作メッセージ送信」をONにしてください。全Applet共通の許可で、Codex連携の許可とは別です。OFFの間は操作を送信しません。
 
 ## コマンド
 

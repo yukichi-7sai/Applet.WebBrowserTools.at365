@@ -3,15 +3,15 @@
   "id": "at365.web-browser-tools",
   "name": "Applet.WebBrowserTools.at365",
   "displayName": "WebBrowserTools.at365",
-  "version": "0.3.1",
-  "minimumHostVersion": "0.26.0",
-  "runtime": "native",
-  "entry": "Applet.WebBrowserTools.at365.exe",
+  "version": "0.3.2",
+  "minimumHostVersion": "0.26.37",
+  "runtime": "node",
+  "entry": "index.js",
   "description": "ブラウザ以外でも使える、ブラウザ用の便利コマンド集。アクティブなウィンドウへ操作を送り、実行場所はショートカット・マウスジェスチャーの割り当て条件で設定できます。",
   "capabilities": [
     "ui",
     "settings",
-    "dynamic-commands"
+    "appdock-api"
   ],
   "commands": [
     {

@@ -13,7 +13,7 @@ const { createDefaultSettings } = require(
 const profile = path.join(root, ".artifacts", `host-${Date.now()}`),
   folder = path.join(profile, "extensions/Applet.WebBrowserTools.at365");
 fs.mkdirSync(folder, { recursive: true });
-for (const name of ["extension.json", "Applet.WebBrowserTools.at365.exe"])
+for (const name of ["extension.json", "index.js"])
   fs.copyFileSync(
     path.join(root, "publish/Applet.WebBrowserTools.at365", name),
     path.join(folder, name),
@@ -80,14 +80,13 @@ async function until(check, message) {
     assert.equal(migrated.wheelDelayMs, 200);
     assert.equal(migrated.indicatorPosition, "window-center");
     assert.equal(migrated.indicatorOpacity, 0.3);
-    assert.match((await state(page)).panel.description, /AppDock本体/);
-    await page.evaluate(() =>
-      window.dock.executeCommand("appdock.settings.open"),
-    );
+    assert.match((await state(page)).panel.description, /本体/);
+    await page.getByRole("button", { name: "Applet", exact: true }).click();
     await page
-      .locator(".settings-applet-list")
-      .getByRole("button", { name: "WebBrowserTools.at365", exact: true })
+      .getByRole("button", { name: "WebBrowserTools.at365", exact: false })
+      .first()
       .click();
+    await page.getByRole("tab", { name: "設定", exact: true }).click();
     assert.equal(
       await page.getByLabel("ジェスチャー：上", { exact: true }).count(),
       0,
@@ -105,14 +104,23 @@ async function until(check, message) {
         ),
       "Live key edit not applied",
     );
+    // Exercise shared persistence; the host's gesture UI suite covers row editing.
+    await page.evaluate(async () => {
+      const current = (await window.dock.snapshot()).settings;
+      current.value.gestures.bindings.find(
+        (row) => row.id === "migrated.move-up",
+      ).gesture = "click-middle";
+      await window.dock.saveSettings(current.value, current.revision);
+      await window.dock.executeCommand("appdock.settings.open");
+    });
     await page
       .getByRole("button", { name: "マウスジェスチャー", exact: true })
       .click();
     await page
-      .getByLabel("割り当て1のジェスチャー")
-      .selectOption("click-middle");
-    await page
-      .getByRole("switch", { name: "マウスジェスチャーを有効にする", exact: true })
+      .getByRole("switch", {
+        name: "マウスジェスチャーを有効にする",
+        exact: true,
+      })
       .click();
     await page
       .getByRole("button", { name: "変更をすべて保存", exact: true })
@@ -141,7 +149,11 @@ async function until(check, message) {
     assert.equal(saved.extensions[id].settings["gestures.up"], "new-tab");
     assert.equal(saved.gestures.enabled, false);
     assert.equal(saved.gestures.bindings.length, 7);
-    assert.equal(saved.gestures.bindings.find(row => row.id === "migrated.move-up").gesture, "click-middle");
+    assert.equal(
+      saved.gestures.bindings.find((row) => row.id === "migrated.move-up")
+        .gesture,
+      "click-middle",
+    );
     await page.evaluate(
       (extension) => window.dock.toggleExtension(extension, false),
       id,
@@ -161,7 +173,7 @@ async function until(check, message) {
           ok: true,
           profile,
           checks: [
-            "native EXE and 11 commands",
+            "Node Applet and 11 commands",
             "legacy gesture migration and host-managed panel",
             "live key edit and restart",
             "host gesture edit, disable and old values preserved",
@@ -173,7 +185,7 @@ async function until(check, message) {
       ),
     );
     console.log(
-      "PASS migration, host gestures, live keys, restart, native Applet and no errors",
+      "PASS migration, host gestures, live keys, restart, Node Applet and no errors",
     );
     console.log(profile);
   } finally {
