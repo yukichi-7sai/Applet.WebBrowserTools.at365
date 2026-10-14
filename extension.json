@@ -3,8 +3,8 @@
   "id": "at365.web-browser-tools",
   "name": "Applet.WebBrowserTools.at365",
   "displayName": "WebBrowserTools.at365",
-  "version": "0.3.2",
-  "minimumHostVersion": "0.26.37",
+  "version": "0.3.3",
+  "minimumHostVersion": "0.36.8",
   "runtime": "node",
   "entry": "index.js",
   "description": "ブラウザ以外でも使える、ブラウザ用の便利コマンド集。アクティブなウィンドウへ操作を送り、実行場所はショートカット・マウスジェスチャーの割り当て条件で設定できます。",
@@ -205,6 +205,30 @@
         "scope": "browser"
       },
       "gesture": "wheel-down"
+    }
+  ],
+  "settingSections": [
+    {
+      "id": "tabs",
+      "title": "タブの操作",
+      "description": "各コマンドを実行したときに送信するキーです。呼び出すショートカットやジェスチャーは本体で設定します。",
+      "settings": [
+        "keys.new-tab",
+        "keys.close-tab",
+        "keys.restore-tab",
+        "keys.previous-tab",
+        "keys.next-tab"
+      ]
+    },
+    {
+      "id": "browser",
+      "title": "ページとウィンドウ",
+      "description": "再読み込みやウィンドウ操作に使うキーを設定します。",
+      "settings": [
+        "keys.super-reload",
+        "keys.new-window",
+        "keys.toggle-fullscreen"
+      ]
     }
   ]
 }

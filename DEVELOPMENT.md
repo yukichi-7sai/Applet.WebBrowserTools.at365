@@ -40,3 +40,7 @@ deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365
 本体管理ジェスチャー・開始対象・取消・初期値・旧設定移行の正本は[本体ジェスチャー仕様](../AppDock.at365/docs/gestures.md)です。初期8操作のmanifest宣言と既存キー・IDを維持します。Appletに対象ブラウザ検査や入力フックを置きません。
 
 更新配布物は[共通更新仕様](../AppDock.at365/docs/updates.md)と[確認手順](../AppDock.at365/docs/update-checklist.md)を参照してください。生成物は.artifactsへ保存し、[本体の整理手順](../AppDock.at365/DEVELOPMENT.md#作業完了時のテストフォルダー整理)に従います。過去記録の旧パスは履歴値として保持します。READMEは利用案内、開発情報は本書、検証結果はVERIFICATIONへ分けます。
+
+## 設定画面の構成
+
+`extension.json`の`settingSections`で用途別のカードを宣言します。描画・余白・入力・検索・保存は[本体の共通テンプレート](../AppDock.at365/docs/extensions.md#共通の設定ページ)へ委譲し、Applet固有の設定フォームやCSSを複製しません。設定キー・既定値・実行処理を変えずに並び順を調整できます。最低本体版は0.36.8です。
