@@ -1,3 +1,4 @@
+const { getPublishDirectory } = require('../../AppDock.at365/scripts/publish-paths.cjs');
 const fs = require("node:fs"),
   path = require("node:path"),
   assert = require("node:assert/strict");
@@ -15,7 +16,7 @@ const profile = path.join(root, ".artifacts", `host-${Date.now()}`),
 fs.mkdirSync(folder, { recursive: true });
 for (const name of ["extension.json", "index.js"])
   fs.copyFileSync(
-    path.join(root, "publish/Applet.WebBrowserTools.at365", name),
+    path.join(getPublishDirectory(root), "Applet.WebBrowserTools.at365", name),
     path.join(folder, name),
   );
 const id = "at365.web-browser-tools",

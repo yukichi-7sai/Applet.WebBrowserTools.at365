@@ -1,5 +1,9 @@
 # WebBrowserTools 開発ガイド
 
+## 発行・配置ファイルの保存先
+
+標準発行先は `A:\40.ARTIFACT\Applet.WebBrowserTools.at365` です。`publish.bat`はソースrepo、`deploy.bat`は発行先から実行します。配置用ファイル・設定の保持とテンプレートの更新は[共通発行手順](../AppDock.at365/docs/publishing.md)を参照してください。
+
 実装・コミット・リリースの段階別検証は[本体共通手順](../AppDock.at365/docs/development-workflow.md)に従います。利用者向けは[README](README.md)、実測結果は[VERIFICATION](VERIFICATION.md)です。
 
 ## ビルド・配置
@@ -9,12 +13,12 @@
 ```bat
 publish.bat
 publish.bat -OutputDirectory "C:\Temp\WebBrowserTools" -AppDockRoot "C:\Source\AppDock.at365"
-deploy.bat "C:\Apps\AppDock.at365"
+A:\40.ARTIFACT\Applet.WebBrowserTools.at365\deploy.bat "C:\Apps\AppDock.at365"
 ```
 
-publishは型検査・Applet単体試験後、index.jsとextension.jsonをpublish/Applet.WebBrowserTools.at365へ、共通パッカーでupdate.zip/update.jsonをpublishへ生成します。指定OutputDirectoryでも更新ZIP/JSONの出力はrepo内publishです。公開・実利用配置はしません。
+publishは型検査・Applet単体試験後、index.jsとextension.jsonをA:/40.ARTIFACT/Applet.WebBrowserTools.at365/Applet.WebBrowserTools.at365へ、共通パッカーでupdate.zip/update.jsonを標準発行先へ生成します。指定OutputDirectoryでも更新ZIP/JSONの出力は`A:\40.ARTIFACT\Applet.WebBrowserTools.at365`です。公開・実利用配置はしません。
 
-deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365へコピーし、旧Applet EXE/DLL/deps.json/runtimeconfig.jsonだけを取り除きます。対象AppDockを終了してから実行してください。引数なしでは[記入例](deploy.local.txt.example)に従うdeploy.local.txtを使い、両方未指定なら配置しません。ホストEXE・設定・データは変更しません。
+deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365へコピーし、旧Applet EXE/DLL/deps.json/runtimeconfig.jsonだけを取り除きます。対象AppDockを終了してから実行してください。引数なしでは[記入例](deployment/deploy.local.txt.example)に従うdeploy.local.txtを使い、両方未指定なら配置しません。ホストEXE・設定・データは変更しません。
 
 ## 実装
 

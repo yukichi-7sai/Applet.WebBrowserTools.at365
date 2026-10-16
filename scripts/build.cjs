@@ -1,3 +1,4 @@
+const { getPublishDirectory } = require('../../AppDock.at365/scripts/publish-paths.cjs');
 const fs = require("node:fs"),
   path = require("node:path"),
   cp = require("node:child_process");
@@ -23,7 +24,7 @@ if (process.argv.includes("--test"))
 if (process.argv.includes("--publish")) {
   const output =
     process.argv[process.argv.indexOf("--publish") + 1] ||
-    path.join(root, "publish/Applet.WebBrowserTools.at365");
+    path.join(getPublishDirectory(root), "Applet.WebBrowserTools.at365");
   fs.mkdirSync(output, { recursive: true });
   fs.copyFileSync(
     path.join(root, "out/index.js"),
