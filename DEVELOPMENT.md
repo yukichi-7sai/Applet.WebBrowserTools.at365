@@ -10,7 +10,7 @@
 
 ## ビルド・配置
 
-0.3.2からsrc/index.tsをJavaScriptへ変換するNode Appletです。隣接するAppDock.at365のtoolchain.jsonに固定したローカルNodeとTypeScriptを使います。グローバル環境やApplet固有の依存追加は不要です。更新ZIP生成には既存の.NET 10 SDKを使います。
+src/index.tsをJavaScriptへ変換するNode Appletです。隣接するAppDock.at365のtoolchain.jsonに固定したローカルNodeとTypeScriptを使います。グローバル環境やApplet固有の依存追加は不要です。更新ZIP生成には既存の.NET 10 SDKを使います。
 
 ```bat
 publish.bat
@@ -37,16 +37,20 @@ deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365
 ..\AppDock.at365\.tools\node\24.21.0\node.exe scripts/test-host.cjs
 ```
 
-単体試験は文法・11操作・設定即時反映・不正変更の原子性・取消・停止を確認します。host試験は旧ジェスチャー設定移行・設定UI・再起動・停止を確認し、割り当て編集自体は本体の専用GUI試験で検証します。第1引数にホストrepo、第2引数にwin-unpacked EXEを渡せます。
+単体試験は文法・11操作・設定即時反映・不正変更の原子性・取消・停止を確認します。第1引数にホストrepo、第2引数にwin-unpacked EXEを渡せます。
 
 実キー/操作メッセージは本体scripts/native-input-ui-test.cjsが専用ウィンドウで確認します。従来の.NET Applet/専用入力・ジェスチャー試験は本体へ移した処理の重複を避けるため削除しました。共通入力と物理ジェスチャーの試験は本体側へ集約します。GUIは直列で実行してください。
 
 ## ジェスチャーと文書
 
-本体管理ジェスチャー・開始対象・取消・初期値・旧設定移行の正本は[本体ジェスチャー仕様](../AppDock.at365/docs/gestures.md)です。初期8操作のmanifest宣言と既存キー・IDを維持します。Appletに対象ブラウザ検査や入力フックを置きません。
+初期8操作のmanifest宣言と既存キー・IDを維持します。Appletに対象ブラウザ検査や入力フックを置きません。
 
 更新配布物は[共通更新仕様](../AppDock.at365/docs/updates.md)と[確認手順](../AppDock.at365/docs/update-checklist.md)を参照してください。生成物は.artifactsへ保存し、[本体の整理手順](../AppDock.at365/DEVELOPMENT.md#作業完了時のテストフォルダー整理)に従います。過去記録の旧パスは履歴値として保持します。READMEは利用案内、開発情報は本書、検証結果はVERIFICATIONへ分けます。
 
 ## 設定画面の構成
 
 `extension.json`の`settingSections`で用途別のカードを宣言します。描画・余白・入力・検索・保存は[本体の共通テンプレート](../AppDock.at365/docs/extensions.md#共通の設定ページ)へ委譲し、Applet固有の設定フォームやCSSを複製しません。設定キー・既定値・実行処理を変えずに並び順を調整できます。最低本体版は0.36.8です。
+
+## 共通の運用
+
+文書構成・生成物・版更新・配布は[共通手順](../AppDock.at365/docs/development-workflow.md)、[文書方針](../AppDock.at365/docs/documentation.md)、[発行と配置](../AppDock.at365/docs/publishing.md)、[更新パッケージ](../AppDock.at365/docs/updates.md)、[生成物の整理](../AppDock.at365/DEVELOPMENT.md#作業完了時のテストフォルダー整理)を参照する。Applet固有の実行条件と結果は[検証記録](VERIFICATION.md)へ記載する。
