@@ -1,10 +1,12 @@
 # WebBrowserTools 開発ガイド
 
+機能の説明・操作方法・設定・既定値・動作環境は[機能・操作・設定](docs/usage.md)を参照してください。共通の文書構成は[ドキュメント方針](../AppDock.at365/docs/documentation.md)に従います。
+
 ## 発行・配置ファイルの保存先
 
 標準発行先は `A:\40.ARTIFACT\Applet.WebBrowserTools.at365` です。`publish.bat`はソースrepo、`deploy.bat`は発行先から実行します。配置用ファイル・設定の保持とテンプレートの更新は[共通発行手順](../AppDock.at365/docs/publishing.md)を参照してください。
 
-実装・コミット・リリースの段階別検証は[本体共通手順](../AppDock.at365/docs/development-workflow.md)に従います。利用者向けは[README](README.md)、実測結果は[VERIFICATION](VERIFICATION.md)です。
+実装・コミット・リリースの段階別検証は[本体共通手順](../AppDock.at365/docs/development-workflow.md)に従います。インストールとビルドの概要は[README](README.md)、実測結果は[VERIFICATION](VERIFICATION.md)です。
 
 ## ビルド・配置
 
