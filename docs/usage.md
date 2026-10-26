@@ -1,6 +1,6 @@
 # Applet.WebBrowserTools.at365 機能・操作・設定
 
-AppDock用のブラウザー便利コマンド集です。ブラウザー以外のアプリでも使えます。Windows x64 / AppDock 0.36.8以降が必要です。v0.3.4はAppDock内で動くJavaScript Appletです。追加のNode.jsやブラウザ拡張のインストールは不要です。
+AppDock用のブラウザー便利コマンド集です。ブラウザー以外のアプリでも使えます。Windows x64 / AppDock 0.36.8以降が必要です。AppDock内で動くJavaScript Appletです。追加のNode.jsやブラウザ拡張のインストールは不要です。
 
 ## 導入・更新
 

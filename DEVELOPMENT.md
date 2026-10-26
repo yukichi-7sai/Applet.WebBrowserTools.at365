@@ -10,11 +10,11 @@
 
 ## ビルド・配置
 
-src/index.tsをJavaScriptへ変換するNode Appletです。隣接するAppDock.at365のtoolchain.jsonに固定したローカルNodeとTypeScriptを使います。グローバル環境やApplet固有の依存追加は不要です。更新ZIP生成には既存の.NET 10 SDKを使います。
+src/index.tsをJavaScriptへ変換するNode Appletです。ホストはスクリプトの位置から`../AppDock.at365`を解決します。publishはホストの`setup-tools.bat`でtoolchain.jsonの固定ツールを準備し、`dev.bat install --frozen-lockfile`で依存を照合してから、`dev.bat exec node`で型検査・単体試験・ビルドを実行します。各段階の失敗時は非0で終了します。グローバル環境やApplet固有の依存追加は不要です。更新ZIP生成には既存の.NET 10 SDKを使います。
 
 ```bat
 publish.bat
-publish.bat -OutputDirectory "C:\Temp\WebBrowserTools" -AppDockRoot "C:\Source\AppDock.at365"
+publish.bat -OutputDirectory ".artifacts\publish-check" -AppDockRoot "..\AppDock.at365"
 A:\40.ARTIFACT\Applet.WebBrowserTools.at365\deploy.bat "C:\Apps\AppDock.at365"
 ```
 
@@ -33,8 +33,8 @@ deployは通常publishの2ファイルをextensions/Applet.WebBrowserTools.at365
 ## 検証
 
 ```powershell
-..\AppDock.at365\.tools\node\24.21.0\node.exe scripts/build.cjs --test
-..\AppDock.at365\.tools\node\24.21.0\node.exe scripts/test-host.cjs
+..\AppDock.at365\dev.bat exec node "$PWD\scripts\build.cjs" --test
+..\AppDock.at365\dev.bat exec node "$PWD\scripts\test-host.cjs"
 ```
 
 単体試験は文法・11操作・設定即時反映・不正変更の原子性・取消・停止を確認します。第1引数にホストrepo、第2引数にwin-unpacked EXEを渡せます。
